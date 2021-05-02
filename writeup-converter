@@ -5,6 +5,16 @@ target_folder=$2
 echo "$source_folder"
 echo "$target_folder"
 
-targets=($(grep -R "\!\[\[" "$source_folder" | awk -F ':' '{print $2}'))
+#set IFS to newline only
+OIFS="$IFS"
+IFS=$'\n'
 
-for i in "${targets[@]}"; do echo "$i"; done
+targets=($(grep -Rh "\!\[\[" "$source_folder"))
+
+for ((i = 0; i < "${#targets[@]}"; i++))
+do
+    echo "${targets[$i]}"
+done
+
+#reset IFS
+IFS="$OIFS"
