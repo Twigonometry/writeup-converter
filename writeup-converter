@@ -1,0 +1,8 @@
+#!/bin/bash
+source_folder=$1
+target_folder=$2
+
+echo "$source_folder"
+echo "$target_folder"
+
+echo $(grep -Rl "\!\[\[" "$source_folder")
