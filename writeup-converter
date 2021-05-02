@@ -5,4 +5,6 @@ target_folder=$2
 echo "$source_folder"
 echo "$target_folder"
 
-echo $(grep -Rl "\!\[\[" "$source_folder")
+targets=($(grep -R "\!\[\[" "$source_folder" | awk -F ':' '{print $2}'))
+
+for i in "${targets[@]}"; do echo "$i"; done
