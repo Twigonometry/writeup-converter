@@ -11,6 +11,11 @@ IFS=$'\n'
 
 targets=($(grep -Rh "\!\[\[" "$source_folder"))
 
+#sed /\!\[\[|\]\]//
+
+targets=("${targets[@]/![[/}")
+targets=("${targets[@]/]]/}")
+
 for ((i = 0; i < "${#targets[@]}"; i++))
 do
     echo "${targets[$i]}"
