@@ -12,14 +12,18 @@ I may in future turn this into an Obsidian plugin
 ```
 $ git@github.com:Twigonometry/writeup-converter.git
 $ cd writeup-converter
-$chmod +x writeup-converter
+$ chmod +x writeup-converter
 ```
 
 ## Usage
 
 ```
-$ ./writeup-converter [SOURCE_FOLDER] [SOURCE_ATTACHMENTS] [TARGET_FOLDER] [TARGET_ATTACHMENTS]
+$ ./writeup-converter [OPTIONS] [SOURCE_FOLDER] [SOURCE_ATTACHMENTS] [TARGET_FOLDER] [TARGET_ATTACHMENTS]
 ```
+
+Options:
+- `--help` displays usage
+- `-p PREFIX` specifies a prefix to remove from the attachment links that are copied across - e.g. if writeups in source folder live in a subdirectory `/Cybersecurity`, internal links to `[[Cybersecurity/Writeups/...]]` will become `[[Writeups/...]]`
 
 Arguments:
 - Source Folder: The writeup you want to copy. Copies the entire directory
