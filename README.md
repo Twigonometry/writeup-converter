@@ -78,7 +78,14 @@ optional arguments:
 For example:
 
 ```bash
-$ python3 writeup-converter.py -r remove_this source attachments target t_attachments
+$ python3 writeup-converter.py -r "Remove this prefix" /home/user/vault/writeup/ /home/user/vault/attachments/ /home/user/target/ /home/user/target/attachments/
+```
+
+File paths with spaces in them must be wrapped in quotes. The program checks the source files exist before running, but it will create directories for targets if they don't exist:
+
+```bash
+$ python3 writeup-converter.py "/home/user/file with a space" /home/user/notreal /home/user/target/ /home/user/target-attachments/
+Source folder path is not a directory. Exiting
 ```
 
 ### Bash Script
