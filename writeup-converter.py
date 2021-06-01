@@ -18,7 +18,7 @@ def main():
     args = parser.parse_args()
 
     #output arguments for debugging
-    for arg in var(args):
+    for arg in vars(args):
         argval = getattr(args, arg)
         if argval is not None:
             print(str(arg) + ": " + str(argval))
