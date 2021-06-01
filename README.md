@@ -2,7 +2,7 @@
 
 A Python script for grabbing markdown files and Obsidian attachments from one folder and copying them to another.
 
-Also contains a quick and dirty bash script for grabbing attachments from one Obsidian folder and copying them to another
+Also contains a quick and dirty bash script that does the same thing with less pizzazz.
 
 ## Why did I make this?
 
@@ -12,7 +12,9 @@ I use this to copy a writeup across to another folder, but you could in theory u
 
 I may in future turn this into an Obsidian plugin (but no promises).
 
-## Install
+## Installation
+
+Using git:
 
 ```
 $ git clone git@github.com:Twigonometry/writeup-converter.git
@@ -45,16 +47,39 @@ Optional Arguments
 Using any command line tool that has Python installed with it:
 
 ```bash
-$ python3 writeup-converter.py 
+$ python3 writeup-converter.py -h
 usage: writeup-converter.py [-h] [-a ADD_PREFIX] [-r REMOVE_PREFIX]
                             source-folder source-attachments target-folder
                             target-attachments
-writeup-converter.py: error: the following arguments are required: source-folder, source-attachments, target-folder, target-attachments
+
+Takes a folder of Obsidian markdown files and copies them across to a new 
+location, automatically copying any attachments. Options available include
+converting to a new set of Markdown files, removing and adding prefixes to
+attachments, and converting for use on a website
+
+positional arguments:
+  source-folder         The folder of markdown files to copy from.
+  source-attachments    The attachments folder in your Obsidian Vault that
+                        holds attachments in the notes.
+  target-folder         The place to drop your converted markdown files
+  target-attachments    The place to drop your converted attachments. Must be
+                        set as your attachments folder in Obsidian (or just
+                        drop them in the root of your vault if you hate
+                        yourself)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -a ADD_PREFIX, --add-prefix ADD_PREFIX
+                        Prefix to add to all your attachment file paths.
+  -r REMOVE_PREFIX, --remove-prefix REMOVE_PREFIX
+                        Prefix to remove from all your attachment file paths.
 ```
 
 For example:
 
-
+```bash
+$ python3 writeup-converter.py -r remove_this source attachments target t_attachments
+```
 
 ### Bash Script
 
