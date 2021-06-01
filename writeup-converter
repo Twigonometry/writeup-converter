@@ -7,8 +7,6 @@ print_usage() {
 #get flags
 while getopts "h:p:" flag; do
 case "$flag" in
-    p|--prefix)
-    prefix=$OPTARG;;
     h|--help)
     print_usage
     exit 1 ;;
@@ -20,8 +18,6 @@ source_folder=${@:$OPTIND:1}
 source_attachments=${@:$OPTIND+1:1}
 target_folder=${@:$OPTIND+2:1}
 target_attachments=${@:$OPTIND+3:1}
-
-echo $prefix
 
 #set IFS to newline only
 OIFS="$IFS"
@@ -35,12 +31,12 @@ targets=("${targets[@]/![[/}")
 targets=("${targets[@]/]]/}")
 
 echo "cp $source_folder $target_folder"
-#cp -r $source_folder $target_folder
+cp -r $source_folder $target_folder
 
 for ((i = 0; i < "${#targets[@]}"; i++))
 do
     echo "Copy $source_attachments${targets[$i]} to $target_attachments"
-    #cp $source_attachments${targets[$i]} $target_attachments
+    cp $source_attachments${targets[$i]} $target_attachments
 done
 
 #reset IFS
