@@ -20,9 +20,27 @@ Using git:
 $ git clone git@github.com:Twigonometry/writeup-converter.git
 ```
 
-To use the Python script (recommended) you also need to [install Python 3.x](https://www.python.org/downloads/)
+**Python**
 
-To prepare the bash script for use:
+To use the Python script (recommended) you also need to [install Python 3.x](https://www.python.org/downloads/). For example, on Ubuntu:
+
+```bash
+$ sudo apt install python3.8
+```
+
+There are no dependencies to install as of writing this, as only core packages are used. But in future if your program will not run you can use pipreqs to generate a `requirements.txt` file locally and then install from it:
+
+```bash
+$ python3 -m pip install pipreqs
+$ pipreqs /path/to/writeup-converter
+$ python3 -m pip install -r /path/to/writeup-converter/requirements.txt
+```
+
+(I've mostly included this in the README because I thought it was cool and didn't want to forget it)
+
+**Bash Script**
+
+If you're using the bash script, make it executable:
 
 ```bash
 $ cd writeup-converter
@@ -75,10 +93,10 @@ optional arguments:
                         Prefix to remove from all your attachment file paths.
 ```
 
-For example:
+For example, when I copied my Cereal writeup:
 
 ```bash
-$ python3 writeup-converter.py -r "Remove this prefix" /home/user/vault/writeup/ /home/user/vault/attachments/ /home/user/target/ /home/user/target/attachments/
+$ python3 writeup-converter.py -r Cybersecurity "/mnt/d/path/to/vault/Cybersecurity/Writeups/Hack the Box/Boxes/Cereal" /mnt/d/path/to/vault/Attachments/ "/mnt/d/OneDrive/OneDrive/Documents/Cybersecurity-Notes/Writeups/Hack the Box/Boxes/Cereal" /mnt/d/OneDrive/OneDrive/Documents/Cybersecurity-Notes/Attachments/
 ```
 
 File paths with spaces in them must be wrapped in quotes. The program checks the source files exist before running, but it will create directories for targets if they don't exist:
@@ -87,6 +105,8 @@ File paths with spaces in them must be wrapped in quotes. The program checks the
 $ python3 writeup-converter.py "/home/user/file with a space" /home/user/notreal /home/user/target/ /home/user/target-attachments/
 Source folder path (/home/user/file with a space) is not a directory. Exiting
 ```
+
+There's no need to also escape the quotes with `\` characters - some terminals will do this automatically if you autocomplete, but these extra backslashes should be removed if they're added.
 
 ### Bash Script
 

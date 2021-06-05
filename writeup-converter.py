@@ -19,23 +19,19 @@ def parse_args():
     #optional flags
     parser.add_argument("-a", "--add_prefix", help="Prefix to add to all your attachment file paths.")
     parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode. Gives details of which files are being copied. Disabled by default in case of large directories")
 
     #parse arguments
     args = parser.parse_args()
 
-    #output arguments for debugging
-    # TODO: remove this
-    for arg in vars(args):
-        argval = getattr(args, arg)
-        if argval is not None:
-            print(str(arg) + ": " + str(argval))
-
     return args
 
-def find_files(source_folder):
+def find_files(source_folder, verbose):
     """finds files within the target directory
     even if the whole directory is being copied, this step is necessary
     as files need to be passed to the find_attachments() method"""
+
+    print("\n=== Finding Files ===\n")
 
     #create an OS-independent Path object for source folder
     sf_path = Path(source_folder)
@@ -50,31 +46,39 @@ def find_files(source_folder):
     filenames = [file for file in os.listdir(sf_path) if not Path(os.path.join(source_folder, file)).is_dir()]
     files = list(map(lambda f: os.path.join(source_folder, f), filenames))
 
-    for file in files:
-        print(file)
+    print(str(len(files)) + " files found")
+
+    if verbose:
+        for file in files:
+            print(file)
 
     #TODO: in future add option to recursively search, for example with os.walk()
     #TODO: also add option for whitelisting/blacklisting file extensions
 
     return filenames, files
 
-def copy_files(files, target):
+def copy_files(files, target, verbose):
     """copy given files from the source directory"""
-    print("Copying files")
+    print("\n=== Copying files ===\n")
 
-    for file in files:
-        print("Copy " + str(file) + " to " + str(target))
-        copy(file, target)
+    if verbose:
+        for file in files:
+            print("Copy " + str(file) + " to " + str(target))
+            copy(file, target)
+
+    print("Files successfully copied to " + str(target) + " directory")
 
 def copy_directory():
     """if user specifies whole directory should be specified"""
     print("Copy directory")
 
-def find_attachments(files, source_attachments):
+def find_attachments(files, source_attachments, verbose):
     """find all paths of attachments in a list of files"""
+    print("\n=== Finding attachments referenced in files ===\n")
 
     #create an OS-independent Path object for source attachments folder
     sa_path = Path(source_attachments)
+    print("Source Attachments path: " + str(sa_path))
 
     if not sa_path.is_dir():
         print("Source attachments folder path (" + str(sa_path) + ") is not a directory. Exiting")
@@ -89,28 +93,37 @@ def find_attachments(files, source_attachments):
     #combine lists
     attachments = itertools.chain.from_iterable(attachments)
 
+    print(str(len(list(attachments))) + " attachments found")
+
+    if verbose:
+        for a in attachments:
+            print(a)
+
     return attachments
 
-def copy_attachments(attachments, target):
+def copy_attachments(attachments, target, verbose):
     """copy all attachments to a new location"""
-    print("Copying attachments")
+    print("\n=== Copying attachments ===\n")
 
     for attachment in attachments:
-        print("Copy " + str(attachment) + " to " + str(target))
+        if verbose:
+            print("Copy " + str(attachment) + " to " + str(target))
         copy(attachment, target)
+    
+    print("Attachments successfully copied")
 
-def remove_prefixes(prefix, files):
+def remove_prefixes(prefix, files, verbose):
     """remove prefixes from all links in new folder"""
-    print("Removing " + prefix + " from beginning of all links")
+    print("\n=== Removing " + prefix + " from beginning of all links ===\n")
 
     prefix = "[[" + prefix + "/"
     
     for file in files:
-        print(str(file))
         with open(file) as f:
             s = f.read()
             if prefix not in s:
-                print('"{prefix}" not found in {file}.'.format(**locals()))
+                if verbose:
+                    print('"{prefix}" not found in {file}.'.format(**locals()))
                 f.close()
                 continue
 
@@ -120,6 +133,8 @@ def remove_prefixes(prefix, files):
             s = s.replace(prefix, "[[")
             f.write(s)
             f.close()
+        
+    print("All existing prefixes removed successfully")
 
 def website_format():
     """combine all files in a directory into one markdown folder
@@ -143,25 +158,22 @@ def main():
         target_attachments.mkdir()
 
     #get plain filenames, file paths and copy
-    filenames, files = find_files(args.source_folder)
+    filenames, files = find_files(args.source_folder, args.verbose)
 
-    copy_files(files, target_path)
+    copy_files(files, target_path, args.verbose)
 
     # print("Target path: " + str(target_path))
 
     new_filepaths = [os.path.join(str(target_path), file) for file in filenames]
 
-    for new_filepath in new_filepaths:
-        print("New file " + new_filepath)
-
     #get all attachments from each file and copy across
-    attachments = find_attachments(files, args.source_attachments)
+    attachments = find_attachments(files, args.source_attachments, args.verbose)
 
-    copy_attachments(attachments, target_attachments)
+    copy_attachments(attachments, target_attachments, args.verbose)
 
     #remove prefixes
     if args.remove_prefix is not None:
-        remove_prefixes(args.remove_prefix, new_filepaths)
+        remove_prefixes(args.remove_prefix, new_filepaths, args.verbose)
 
 if __name__ == '__main__':
     main()
