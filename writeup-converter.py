@@ -18,7 +18,7 @@ def parse_args():
 
     #optional flags
     parser.add_argument("-a", "--add_prefix", help="Prefix to add to all your attachment file paths.")
-    parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
+    # parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode. Gives details of which files are being copied. Disabled by default in case of large directories")
 
     #parse arguments

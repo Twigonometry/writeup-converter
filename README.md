@@ -58,7 +58,8 @@ Positional Arguments:
 - Target Attachments: The path to the obsidian attachments folder in your new location
 
 Optional Arguments
-- `-p PREFIX` specifies a prefix to remove from the attachment links that are copied across - e.g. if writeups in source folder live in a subdirectory `/Cybersecurity`, internal links to `[[Cybersecurity/Writeups/...]]` will become `[[Writeups/...]]`
+- `-r REMOVE_PREFIX` specifies a prefix to remove from the attachment links that are copied across - e.g. if writeups in source folder live in a subdirectory `/Cybersecurity`, internal links to `[[Cybersecurity/Writeups/...]]` will become `[[Writeups/...]]`
+- `-v VERBOSE` enables verbose mode, where all file names are outputted while copying. Can make the screen quite busy for a large directory
 
 ### Python
 
@@ -66,31 +67,32 @@ Using any command line tool that has Python installed with it:
 
 ```bash
 $ python3 writeup-converter.py -h
-usage: writeup-converter.py [-h] [-a ADD_PREFIX] [-r REMOVE_PREFIX]
-                            source-folder source-attachments target-folder
-                            target-attachments
+usage: writeup-converter.py [-h] [-a ADD_PREFIX] [-r REMOVE_PREFIX] [-v]
+                            source_folder source_attachments target_folder
+                            target_attachments
 
-Takes a folder of Obsidian markdown files and copies them across to a new 
+Takes a folder of Obsidian markdown files and copies them across to a new
 location, automatically copying any attachments. Options available include
 converting to a new set of Markdown files, removing and adding prefixes to
 attachments, and converting for use on a website
 
 positional arguments:
-  source-folder         The folder of markdown files to copy from.
-  source-attachments    The attachments folder in your Obsidian Vault that
+  source_folder         The folder of markdown files to copy from.
+  source_attachments    The attachments folder in your Obsidian Vault that
                         holds attachments in the notes.
-  target-folder         The place to drop your converted markdown files
-  target-attachments    The place to drop your converted attachments. Must be
+  target_folder         The place to drop your converted markdown files
+  target_attachments    The place to drop your converted attachments. Must be
                         set as your attachments folder in Obsidian (or just
                         drop them in the root of your vault if you hate
                         yourself)
 
 optional arguments:
   -h, --help            show this help message and exit
-  -a ADD_PREFIX, --add-prefix ADD_PREFIX
+  -a ADD_PREFIX, --add_prefix ADD_PREFIX
                         Prefix to add to all your attachment file paths.
-  -r REMOVE_PREFIX, --remove-prefix REMOVE_PREFIX
-                        Prefix to remove from all your attachment file paths.
+  -v, --verbose         Verbose mode. Gives details of which files are being
+                        copied. Disabled by default in case of large
+                        directories
 ```
 
 For example, when I copied my Cereal writeup:
