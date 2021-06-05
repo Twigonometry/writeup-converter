@@ -79,22 +79,45 @@ def find_attachments(files, source_attachments):
     
     for file in files:
         #extract attachment names
-        attachments.append(list(map(lambda x: x[0], filter(None, map(lambda y: re.findall(r'\!\[\[(.*)\]\]', y), open(file))))))
+        attachments.append(list(map(lambda x: Path(os.path.join(source_attachments, x[0])), filter(None, map(lambda y: re.findall(r'\!\[\[(.*)\]\]', y), open(file))))))
 
     #combine lists
     attachments = itertools.chain.from_iterable(attachments)
-    print(list(attachments))
+    # print(list(attachments))
 
     return attachments
+
+def copy_attachments(attachments, target):
+    """copy all attachments to a new location"""
+
+    for attachment in attachments:
+        print("Copy " + str(attachment) + " to " + str(target))
+        copy(attachment, target)
+
+def remove_prefixes():
+    """remove prefixes from all attachments in new folder"""
+    print("Remove prefixes")
+
+def website_format():
+    """combine all files in a directory into one markdown folder
+    turn backlinks into header links
+    turn attachment links into image links (if they have an image file extension)"""
+
+    print("Reformat to go on a website")
 
 def main():
     args = parse_args()
 
-    #create target folder if it doesn't exist
+    #create target folders if they don't exist
     target_path = Path(args.target_folder)
     if not target_path.is_dir():
         print("Creating target folder")
         target_path.mkdir()
+
+    target_attachments = Path(args.target_attachments)
+    if not target_attachments.is_dir():
+        print("Creating target attachments folder")
+        target_attachments.mkdir()
 
     #get file paths
     files = find_files(args.source_folder)
@@ -104,8 +127,10 @@ def main():
     #get all attachments from each file
     attachments = find_attachments(files, args.source_attachments)
 
-    # copy_attachments()
-    # this method needs to create attachments directory if it doens't exist
+    # weirdly, calling this clears the attachments variable...
+    # print(list(attachments))
+
+    copy_attachments(attachments, target_attachments)
 
 if __name__ == '__main__':
     main()
