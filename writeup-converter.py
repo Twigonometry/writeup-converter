@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import os
 import re
+import itertools
 
 def parse_args():
     #setup argparse
@@ -63,16 +64,12 @@ def find_attachments(files, source_attachments):
     attachments = []
     
     for file in files:
-        #this is nasty - perhaps a lambda would be better, or at least don't do the regex twice
+        #extract attachment names
         attachments.append(list(map(lambda x: x[0], filter(None, map(lambda y: re.findall(r'\!\[\[(.*)\]\]', y), open(file))))))
-        # attachments.append(list(map(lambda x: x[0], filter(None, map(lambda x: re.findall(r'\!\[\[', x), open(file))))))
-        # attachments.append([re.findall(r'\!\[\[', line)[0] if len(re.findall(r'\!\[\[', line)) for line in open(file)])
 
-        # attachments.append(list(map(lambda x: x[0], filter(None, map(lambda x: [ re.findall(r'\!\[\[', x)[0] for line in x ], open(file))))))
-
-    for attachment in attachments:
-        print(attachment)
-        # print(Path(attachment))
+    #combine lists
+    attachments = itertools.chain.from_iterable(attachments)
+    print(list(attachments))
 
 def main():
     args = parse_args()
