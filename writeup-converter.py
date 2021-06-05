@@ -17,8 +17,8 @@ def parse_args():
     parser.add_argument("target_attachments", help="The place to drop your converted attachments. Must be set as your attachments folder in Obsidian (or just drop them in the root of your vault if you hate yourself)")
 
     #optional flags
-    parser.add_argument("-a", "--add_prefix", help="Prefix to add to all your attachment file paths.")
-    # parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
+    # parser.add_argument("-a", "--add_prefix", help="Prefix to add to all your attachment file paths.")
+    parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode. Gives details of which files are being copied. Disabled by default in case of large directories")
 
     #parse arguments
@@ -91,13 +91,13 @@ def find_attachments(files, source_attachments, verbose):
         attachments.append(list(map(lambda x: Path(os.path.join(source_attachments, x[0])), filter(None, map(lambda y: re.findall(r'\!\[\[(.*)\]\]', y), open(file))))))
 
     #combine lists
-    attachments = itertools.chain.from_iterable(attachments)
+    attachments = list(itertools.chain.from_iterable(attachments))
 
-    print(str(len(list(attachments))) + " attachments found")
+    print(str(len(attachments)) + " attachments found")
 
     if verbose:
         for a in attachments:
-            print(a)
+            print(str(a))
 
     return attachments
 
