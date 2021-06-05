@@ -1,6 +1,8 @@
 import argparse
 import sys
 from pathlib import Path
+import os
+import re
 
 def parse_args():
     #setup argparse
@@ -27,26 +29,59 @@ def parse_args():
 
     return args
 
-def find_files(source_folder, source_attachments):
+def find_files(source_folder):
     """finds files within the target directory"""
 
-    #create an OS-independent Path object for source folder and attachments folder
+    #create an OS-independent Path object for source folder
     sf_path = Path(source_folder)
-    sa_path = Path(source_attachments)
 
     #check directories exist
     if not sf_path.is_dir():
         print("Source folder path (" + str(sf_path) + ") is not a directory. Exiting")
         sys.exit(1)
 
+    #compose list of filepaths
+    files = [os.path.join(source_folder, file) for file in os.listdir(sf_path)]
+
+    for file in files:
+        print(file)
+
+    #TODO: in future add option to recursively search, for example with os.walk()
+
+    return files
+
+def find_attachments(files, source_attachments):
+    """find all paths of attachments in a list of files"""
+
+    #create an OS-independent Path object for source attachments folder
+    sa_path = Path(source_attachments)
+
     if not sa_path.is_dir():
         print("Source attachments folder path (" + str(sa_path) + ") is not a directory. Exiting")
         sys.exit(1)
 
+    attachments = []
+    
+    for file in files:
+        #this is nasty - perhaps a lambda would be better, or at least don't do the regex twice
+        attachments.append(list(map(lambda x: x[0], filter(None, map(lambda y: re.findall(r'\!\[\[(.*)\]\]', y), open(file))))))
+        # attachments.append(list(map(lambda x: x[0], filter(None, map(lambda x: re.findall(r'\!\[\[', x), open(file))))))
+        # attachments.append([re.findall(r'\!\[\[', line)[0] if len(re.findall(r'\!\[\[', line)) for line in open(file)])
+
+        # attachments.append(list(map(lambda x: x[0], filter(None, map(lambda x: [ re.findall(r'\!\[\[', x)[0] for line in x ], open(file))))))
+
+    for attachment in attachments:
+        print(attachment)
+        # print(Path(attachment))
+
 def main():
     args = parse_args()
 
-    find_files(args.source_folder, args.source_attachments)
+    #get file paths
+    files = find_files(args.source_folder)
+
+    #get all attachments from each file
+    attachments = find_attachments(files, args.source_attachments)
 
 if __name__ == '__main__':
     main()

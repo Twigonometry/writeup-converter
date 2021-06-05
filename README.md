@@ -85,7 +85,7 @@ File paths with spaces in them must be wrapped in quotes. The program checks the
 
 ```bash
 $ python3 writeup-converter.py "/home/user/file with a space" /home/user/notreal /home/user/target/ /home/user/target-attachments/
-Source folder path is not a directory. Exiting
+Source folder path (/home/user/file with a space) is not a directory. Exiting
 ```
 
 ### Bash Script
