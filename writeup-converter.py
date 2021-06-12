@@ -20,6 +20,7 @@ def parse_args():
     # parser.add_argument("-a", "--add_prefix", help="Prefix to add to all your attachment file paths.")
     parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode. Gives details of which files are being copied. Disabled by default in case of large directories")
+    parser.add_argument("-w", "--website", help="Use website formatting when files are copied. Files combined into one markdown file with HTML elements, specify the name of this file after the flag")
 
     #parse arguments
     args = parser.parse_args()
@@ -43,7 +44,7 @@ def find_files(source_folder, verbose):
         sys.exit(1)
 
     #compose list of filenames (on their own) and filepaths
-    filenames = [file for file in os.listdir(sf_path) if not Path(os.path.join(source_folder, file)).is_dir()]
+    filenames = [file for file in os.listdir(sf_path) if not Path(os.path.join(source_folder, file)).is_dir() and file.lower().endswith('.md')]
     files = list(map(lambda f: os.path.join(source_folder, f), filenames))
 
     print(str(len(files)) + " files found")
@@ -136,12 +137,99 @@ def remove_prefixes(prefix, files, verbose):
         
     print("All existing prefixes removed successfully")
 
-def website_format():
+def combine_files(files, target_path, filename, verbose):
+    "combine all found files into a single markdown file"
+
+    combined_path = os.path.join(target_path, filename)
+
+    with open(combined_path, 'w') as outfile:
+        for f in files:
+            with open(f) as infile:
+                if verbose:
+                    print("Integrating file: " + str(f))
+                for line in infile:
+                    outfile.write(line)
+                outfile.write("\n")
+
+    return combined_path
+
+def website_format(files, target_path, target_attachments, filename, verbose):
     """combine all files in a directory into one markdown folder
     turn backlinks into header links
-    turn attachment links into image links (if they have an image file extension)"""
+    turn attachment links into image links (if they have an image file extension)
+    create a contents page"""
 
-    print("Reformat to go on a website")
+    print("Reformatting file to go on a website")
+
+    combined_path = combine_files(files, target_path, filename, verbose)
+
+    # below code adapted from:
+    # https://stackoverflow.com/questions/48409527/multiple-regex-string-replace-on-large-text-file-using-python
+    # and https://stackoverflow.com/questions/2763750/how-to-replace-only-part-of-the-match-with-python-re-sub
+
+    # open the source file and read it
+    fh = open(combined_path, 'r')
+    text = fh.read()
+    fh.close()
+
+    #create patterns
+
+    #match attachments of form ![[a.png]]
+    p_a = re.compile(r'\!\[\[(.*)\]\]')
+
+    #match links of form [[x#y|z]]
+    p_xyz = re.compile(r'\[\[(.*)\#(.*)\|(.*)\]\]')
+
+    p_xz = re.compile(r'\[\[(.*)\|(.*)\]\]')
+
+    p_xy = re.compile(r'\[\[(.*)\#(.*)\]\]')
+
+    p_x = re.compile(r'\[\[(.*)\]\]')
+
+    #replace stuff
+
+    #![[a.png]] -> <img src="/path/to/attachments/a.png">
+    result = re.sub(p_a, r"<img src=\"{}\/\1\"".format(target_attachments), text)
+
+    #[[x#y|z]] -> <a href="#y">z</a>
+    result = re.sub(p_xyz, r"<a href=\"#\2\">\3</a>", result)
+
+    #[[x|z]] -> <a href="#x">z</a>
+    result = re.sub(p_xz, r"<a href=\"#\1\">\2</a>", result)
+
+    #[[x#y]] -> <a href="#y">y</a>
+    result = re.sub(p_xy, r"<a href=\"#\2\">\2</a>", result)
+
+    #[[x]] -> <a href="#x">x</a>
+    result = re.sub(p_x, r"<a href=\"#\1\">\1</a>", result)
+
+    # # write the file
+    f_out = open(combined_path, 'w')
+    f_out.write(result)
+    f_out.close()
+
+    #####
+
+    #match all obsidian links
+    # p1 = re.compile(r'\[\[\(.*)\]\]')
+
+    
+
+    # match all these
+    # if # in, if | in, if both, if !
+
+
+    # # p2 = re.compile(r'\n')
+    # #match all newline except the one followed by digits in quotes.
+    # p2 = re.compile(r'\n+(?!\"\d+\")')
+    # p3 = re.compile(r'\\N')
+    # p4 = re.compile(r'\=\\\"')
+
+    # # do the replace
+    # result = p1.sub("", text)
+    # result = p2.sub("", result)
+    # result = p3.sub("", result)
+    # result = p4.sub('="', result)
 
 def main():
     args = parse_args()
@@ -160,20 +248,23 @@ def main():
     #get plain filenames, file paths and copy
     filenames, files = find_files(args.source_folder, args.verbose)
 
-    copy_files(files, target_path, args.verbose)
+    #if user wants website formatting, do that - otherwise, just copy files
+    #TODO: this isn't skipped if no -w flag
+    if args.website is not None:
+        website_format(files, target_path, str(target_attachments), args.website, args.verbose)
+    else:
+        copy_files(files, target_path, args.verbose)
 
-    # print("Target path: " + str(target_path))
+        new_filepaths = [os.path.join(str(target_path), file) for file in filenames]
 
-    new_filepaths = [os.path.join(str(target_path), file) for file in filenames]
+        #remove prefixes
+        if args.remove_prefix is not None:
+            remove_prefixes(args.remove_prefix, new_filepaths, args.verbose)
 
     #get all attachments from each file and copy across
     attachments = find_attachments(files, args.source_attachments, args.verbose)
 
     copy_attachments(attachments, target_attachments, args.verbose)
-
-    #remove prefixes
-    if args.remove_prefix is not None:
-        remove_prefixes(args.remove_prefix, new_filepaths, args.verbose)
 
 if __name__ == '__main__':
     main()

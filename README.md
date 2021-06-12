@@ -110,6 +110,19 @@ Source folder path (/home/user/file with a space) is not a directory. Exiting
 
 There's no need to also escape the quotes with `\` characters - some terminals will do this automatically if you autocomplete, but these extra backslashes should be removed if they're added.
 
+#### Website Formatter
+
+To copy a writeup but format it for a website, use the `--website` or `-w` flag. You must provide the name of the file to be outputted, but you can leave the rest of the options the same (where attachments folder here is an images directory etc rather than an obsidian attachments folder).
+
+The formatter will perform the following operations:
+- concatenate all `.md` files it finds in the folder
+- turn links of form `[[x]]` into `<a href="#x">x</a>`
+- turn links of form `[[x#y]]` into `<a href="#y">y</a>`
+- turn links of form `[[x|z]]` into `<a href="#x">z</a>`
+- turn links of form `[[x#y|z]]` into `<a href="#y">z</a>`
+- turn links of form `![[a.png]]` into `<img src="/path/to/attachments/a.png">`
+- any links to obsidian notes not part of the folder being copied will just have the `[[` and `]]` strings stripped
+
 ### Bash Script
 
 ```bash
