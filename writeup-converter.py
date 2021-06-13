@@ -149,7 +149,7 @@ def combine_files(files, target_path, filename, verbose):
                     print("Integrating file: " + str(f))
                 for line in infile:
                     outfile.write(line)
-                outfile.write("\n")
+                outfile.write("\n\n")
 
     return combined_path
 
@@ -188,48 +188,25 @@ def website_format(files, target_path, target_attachments, filename, verbose):
 
     #replace stuff
 
-    #![[a.png]] -> <img src="/path/to/attachments/a.png">
-    result = re.sub(p_a, r"<img src=\"{}\/\1\"".format(target_attachments), text)
+    #![[a.png]] -> ![](/path/to/attachments/a.png)
+    result = re.sub(p_a, r"![]({}/\1)".format(target_attachments), text)
 
-    #[[x#y|z]] -> <a href="#y">z</a>
-    result = re.sub(p_xyz, r"<a href=\"#\2\">\3</a>", result)
+    #[[x#y|z]] -> [z](#y)
+    result = re.sub(p_xyz, r"[\3](\2)", result)
 
     #[[x|z]] -> <a href="#x">z</a>
-    result = re.sub(p_xz, r"<a href=\"#\1\">\2</a>", result)
+    result = re.sub(p_xz, r"[\2](\1)", result)
 
     #[[x#y]] -> <a href="#y">y</a>
-    result = re.sub(p_xy, r"<a href=\"#\2\">\2</a>", result)
+    result = re.sub(p_xy, r"[\2](\2)", result)
 
     #[[x]] -> <a href="#x">x</a>
-    result = re.sub(p_x, r"<a href=\"#\1\">\1</a>", result)
+    result = re.sub(p_x, r"[\1](\1)", result)
 
     # # write the file
     f_out = open(combined_path, 'w')
     f_out.write(result)
     f_out.close()
-
-    #####
-
-    #match all obsidian links
-    # p1 = re.compile(r'\[\[\(.*)\]\]')
-
-    
-
-    # match all these
-    # if # in, if | in, if both, if !
-
-
-    # # p2 = re.compile(r'\n')
-    # #match all newline except the one followed by digits in quotes.
-    # p2 = re.compile(r'\n+(?!\"\d+\")')
-    # p3 = re.compile(r'\\N')
-    # p4 = re.compile(r'\=\\\"')
-
-    # # do the replace
-    # result = p1.sub("", text)
-    # result = p2.sub("", result)
-    # result = p3.sub("", result)
-    # result = p4.sub('="', result)
 
 def main():
     args = parse_args()
