@@ -21,6 +21,7 @@ def parse_args():
     parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode. Gives details of which files are being copied. Disabled by default in case of large directories")
     parser.add_argument("-w", "--website", help="Use website formatting when files are copied. Files combined into one markdown file with HTML elements, specify the name of this file after the flag")
+    parser.add_argument("-l", "--asset_rel_path", help="Relative path for site assets e.g. /assets/images/blogs/..., include this or full system path will be added to links")
 
     #parse arguments
     args = parser.parse_args()
@@ -153,7 +154,7 @@ def combine_files(files, target_path, filename, verbose):
 
     return combined_path
 
-def website_format(files, target_path, target_attachments, filename, verbose):
+def website_format(files, target_path, attachments_rel, filename, verbose):
     """combine all files in a directory into one markdown folder
     turn backlinks into header links
     turn attachment links into image links (if they have an image file extension)
@@ -186,22 +187,32 @@ def website_format(files, target_path, target_attachments, filename, verbose):
 
     p_x = re.compile(r'\[\[(.*)\]\]')
 
+    p_final_xy = re.compile(r'\[(.*)\]\(\#(.*)\)')
+
     #replace stuff
 
+    #create lambda for lowercasing and hyphenating links
+    #cannot create one lambda as each group is numbered differently
+    # replacement = lambda pat: pat.group(1)
+
     #![[a.png]] -> ![](/path/to/attachments/a.png)
-    result = re.sub(p_a, r"![]({}/\1)".format(target_attachments), text)
+    result = re.sub(p_a, r"![]({}/\1)".format(attachments_rel), text)
 
     #[[x#y|z]] -> [z](#y)
-    result = re.sub(p_xyz, r"[\3](\2)", result)
+    result = re.sub(p_xyz, r"[\3](#\2)", result)
 
     #[[x|z]] -> <a href="#x">z</a>
-    result = re.sub(p_xz, r"[\2](\1)", result)
+    result = re.sub(p_xz, r"[\2](#\1)", result)
 
     #[[x#y]] -> <a href="#y">y</a>
-    result = re.sub(p_xy, r"[\2](\2)", result)
+    result = re.sub(p_xy, r"[\2](#\2)", result)
 
     #[[x]] -> <a href="#x">x</a>
-    result = re.sub(p_x, r"[\1](\1)", result)
+    result = re.sub(p_x, r"[\1](#\1)", result)
+
+    #finally, turn reformatted links into lowercase and hyphenated
+    replacement = lambda pat: "[" + pat.group(1) + "](#" + pat.group(2).lower().replace(" ", "-") + ")"
+    result = re.sub(p_final_xy, replacement, result)
 
     # # write the file
     f_out = open(combined_path, 'w')
@@ -227,8 +238,8 @@ def main():
 
     #if user wants website formatting, do that - otherwise, just copy files
     #TODO: this isn't skipped if no -w flag
-    if args.website is not None:
-        website_format(files, target_path, str(target_attachments), args.website, args.verbose)
+    if args.website:
+        website_format(files, target_path, args.asset_rel_path, args.website, args.verbose)
     else:
         copy_files(files, target_path, args.verbose)
 
