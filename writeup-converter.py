@@ -154,6 +154,30 @@ def combine_files(files, target_path, filename, verbose):
 
     return combined_path
 
+def create_contents(text):
+    """create a contents table from parsed headers"""
+
+    contents = "# Contents"
+
+    headers = re.findall(r'(\#+ .*)', text)
+
+    for header in headers:
+        level = header.count('#')
+
+        #get index of header name in string
+        name_index = header.index("# ")
+        header_content = header[name_index + 2:]
+
+        #make header link
+        header_link = "[" + header_content + "](#" + header_content.lower().replace(" ", "-") + ")"
+
+        contents += "\n"
+        contents += "  " * (level - 1)
+        contents += "- "
+        contents += header_link
+
+    return contents
+
 def website_format(files, target_path, attachments_rel, filename, verbose):
     """combine all files in a directory into one markdown folder
     turn backlinks into header links
@@ -213,6 +237,8 @@ def website_format(files, target_path, attachments_rel, filename, verbose):
     #finally, turn reformatted links into lowercase and hyphenated
     replacement = lambda pat: "[" + pat.group(1) + "](#" + pat.group(2).lower().replace(" ", "-") + ")"
     result = re.sub(p_final_xy, replacement, result)
+
+    result = create_contents(result) + "\n\n" + result
 
     # # write the file
     f_out = open(combined_path, 'w')

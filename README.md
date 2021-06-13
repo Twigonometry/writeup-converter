@@ -1,6 +1,6 @@
 # writeup-converter
 
-A Python script for grabbing markdown files and Obsidian attachments from one folder and copying them to another.
+A Python script for grabbing markdown files and Obsidian attachments from one folder and copying them to another. Also contains a 'website formatter' that uses regex to parse markdown headers and links and reformat them to create Jekyll-friendly links and contents tables.
 
 Also contains a quick and dirty bash script that does the same thing with less pizzazz.
 
@@ -114,6 +114,8 @@ There's no need to also escape the quotes with `\` characters - some terminals w
 
 To copy a writeup but format it for a website, use the `--website` or `-w` flag. You must provide the name of the file to be outputted, but you can leave the rest of the options the same (where attachments folder here is an images directory etc rather than an obsidian attachments folder).
 
+I use this after my initial conversion - i.e. I use the normal script to copy from a private vault to a public one and editing out anything I don't want, then use the `-w` flag to send it to my website repository.
+
 The formatter will perform the following operations:
 - concatenate all `.md` files it finds in the folder
 - turn links of form `[[x]]` into `<a href="#x">x</a>`
@@ -122,6 +124,24 @@ The formatter will perform the following operations:
 - turn links of form `[[x#y|z]]` into `<a href="#y">z</a>`
 - turn links of form `![[a.png]]` into `<img src="/path/to/attachments/a.png">`
 - any links to obsidian notes not part of the folder being copied will just have the `[[` and `]]` strings stripped
+
+Example usage:
+
+```bash
+python3 writeup-converter.py -w 2021-06-12-htb-cereal.md -l /assets/images/blogs "../Cybersecurity-Notes/Writeups/Hack the Box/Boxes/Cereal/" "../Cybersecurity-Notes/Attachments/" "/mnt/d/OneDrive/OneDrive/Personal Site/mac-goodwin.com/mac-goodwin/blog/HTB/_posts/" "/mnt/d/OneDrive/OneDrive/Personal Site/mac-goodwin.com/mac-goodwin/assets/images/blogs/"
+```
+
+IMPORTANT NOTE: Sometimes copying large amount of files over to Jekyll folder while the server is running will crash the server and make it unresponsive to Ctrl+C, `pkill -9` etc. It's worth stopping serving before running the converter.
+
+You may have to do a bit of manual work each time:
+- Add an initial title to the markdown file
+- Depending on how you number your files, the sections may be out of order (I commonly have `5 - Enumeration` and `10 - Website`, so Enumeration often ends up at the bottom)
+- Remove any markdown files you *don't* want to include (for example, I often have an index file for linking the obsidian notes which is unnecessary on a website)
+- Some links may not be turned into markdown links if they're just plain `http://...` links - this may be added as a feature in future
+- You may need to add an initial yaml if using a templating engine like Jekyll
+- Add/remove tags from the writeup as you see fit
+- Add image captions/alt text (i.e. inside the square brackets in a `![]()` tag)
+- Check all the links in the contents page work - it does a decent job, but can't always predict how element IDs will be generated, especially for ones with special characters
 
 ### Bash Script
 
