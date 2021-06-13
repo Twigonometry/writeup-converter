@@ -60,6 +60,8 @@ Positional Arguments:
 Optional Arguments
 - `-r REMOVE_PREFIX` specifies a prefix to remove from the attachment links that are copied across - e.g. if writeups in source folder live in a subdirectory `/Cybersecurity`, internal links to `[[Cybersecurity/Writeups/...]]` will become `[[Writeups/...]]`
 - `-v VERBOSE` enables verbose mode, where all file names are outputted while copying. Can make the screen quite busy for a large directory
+- `-w` tells the script to format your files for a website. This will combine them all into a single markdown file and reformat links, as well as adding a contents section to replace the obsidian index
+- `-l` tells the script the relative path of your site's assets folder to use when creating image links when website formatting
 
 ### Python
 
@@ -128,7 +130,7 @@ The formatter will perform the following operations:
 Example usage:
 
 ```bash
-python3 writeup-converter.py -w 2021-06-12-htb-cereal.md -l /assets/images/blogs "../Cybersecurity-Notes/Writeups/Hack the Box/Boxes/Cereal/" "../Cybersecurity-Notes/Attachments/" "/mnt/d/OneDrive/OneDrive/Personal Site/mac-goodwin.com/mac-goodwin/blog/HTB/_posts/" "/mnt/d/OneDrive/OneDrive/Personal Site/mac-goodwin.com/mac-goodwin/assets/images/blogs/"
+python3 writeup-converter.py -w 2021-06-12-htb-cereal.md -l /assets/images/blogs "/path/to/Cybersecurity-Notes/Writeups/Hack the Box/Boxes/Cereal/" "/path/to/Cybersecurity-Notes/Attachments/" "/path/to/Personal Site/mac-goodwin.com/mac-goodwin/blog/HTB/_posts/" "/path/to/Personal Site/mac-goodwin.com/mac-goodwin/assets/images/blogs/"
 ```
 
 IMPORTANT NOTE: Sometimes copying large amount of files over to Jekyll folder while the server is running will crash the server and make it unresponsive to Ctrl+C, `pkill -9` etc. It's worth stopping serving before running the converter.
