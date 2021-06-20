@@ -125,7 +125,7 @@ The formatter will perform the following operations:
 - turn links of form `[[x|z]]` into `<a href="#x">z</a>`
 - turn links of form `[[x#y|z]]` into `<a href="#y">z</a>`
 - turn links of form `![[a.png]]` into `<img src="/path/to/attachments/a.png">`
-- any links to obsidian notes not part of the folder being copied will just have the `[[` and `]]` strings stripped
+- any links to obsidian notes not part of the folder being copied will just have the `[[` and `]]` strings stripped (TODO)
 
 Example usage:
 
@@ -144,6 +144,7 @@ You may have to do a bit of manual work each time:
 - Add/remove tags from the writeup as you see fit
 - Add image captions/alt text (i.e. inside the square brackets in a `![]()` tag)
 - Check all the links in the contents page work - it does a decent job, but can't always predict how element IDs will be generated, especially for ones with special characters
+- If you're using a templating engine like Liquid, you may have to escape certain characters (for example, using a `{% raw %}` and `{% endraw %}` tag around occurrences of `{{}}`)
 
 ### Bash Script
 
