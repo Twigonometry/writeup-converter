@@ -8,7 +8,7 @@ from shutil import copy
 
 def parse_args():
     #setup argparse
-    parser = argparse.ArgumentParser(prog="writeup-converter.py", description="Takes a folder of Obsidian markdown files and copies them across to a new location, automatically copying any attachments. Options available include converting to a new set of Markdown files, removing and adding prefixes to attachments, and converting for use on a website")
+    parser = argparse.ArgumentParser(prog="writeup_converter.py", description="Takes a folder of Obsidian markdown files and copies them across to a new location, automatically copying any attachments. Options available include converting to a new set of Markdown files, removing and adding prefixes to attachments, and converting for use on a website")
 
     #positional arguments
     parser.add_argument("source_folder", help="The folder of markdown files to copy from.")
@@ -63,10 +63,9 @@ def copy_files(files, target, verbose):
     """copy given files from the source directory"""
     print("\n=== Copying files ===\n")
 
-    if verbose:
-        for file in files:
-            print("Copy " + str(file) + " to " + str(target))
-            copy(file, target)
+    for file in files:
+        print("Copy " + str(file) + " to " + str(target))
+        copy(file, target)
 
     print("Files successfully copied to " + str(target) + " directory")
 
@@ -121,6 +120,7 @@ def remove_prefixes(prefix, files, verbose):
     prefix = "[[" + prefix + "/"
     
     for file in files:
+        print(file)
         with open(file) as f:
             s = f.read()
             if prefix not in s:
@@ -267,6 +267,7 @@ def main():
     if args.website:
         website_format(files, target_path, args.asset_rel_path, args.website, args.verbose)
     else:
+        print(target_path)
         copy_files(files, target_path, args.verbose)
 
         new_filepaths = [os.path.join(str(target_path), file) for file in filenames]
