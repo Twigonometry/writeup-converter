@@ -138,7 +138,7 @@ def pdf_format(filepath, internal_prefix):
     print(p_final_xy.findall(result))
     result = re.sub(p_final_xy, replacement, result)
 
-    result = writeup_converter.create_contents(result) + "\n\n" + result
+    result = writeup_converter.create_contents(result, True) + "\n\n" + result
 
     # overwrite the file
     f_out = open(filepath, 'w')
@@ -159,6 +159,15 @@ def main():
 
     if args.website:
         pdf_format(filename, args.url_prefix)
+    else:
+        print("Making contents")
+        result = open(filename).read()
+        result = writeup_converter.create_contents(result, True) + "\n\n" + result
+
+    # overwrite the file
+    f_out = open(filename, 'w')
+    f_out.write(result)
+    f_out.close()
 
 if __name__ == '__main__':
     main()

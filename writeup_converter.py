@@ -154,7 +154,7 @@ def combine_files(files, target_path, filename, verbose):
 
     return combined_path
 
-def create_contents(text):
+def create_contents(text, obsidian):
     """create a contents table from parsed headers"""
 
     contents = "# Contents"
@@ -169,7 +169,11 @@ def create_contents(text):
         header_content = header[name_index + 2:]
 
         #make header link
-        header_link = "[" + header_content + "](#" + header_content.lower().replace(" ", "-") + ")"
+        #if it's for obsidian, use internal link and don't replace whitespace
+        if obsidian:
+            header_link = "[[#" + header_content + "]]"
+        else:
+            header_link = "[" + header_content + "](#" + header_content.lower().replace(" ", "-") + ")"
 
         contents += "\n"
         contents += "  " * (level - 1)
