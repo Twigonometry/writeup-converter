@@ -77,14 +77,13 @@ def pdf_format(filepath, internal_prefix):
     if --url_prefix set, add that to links
     attachments_rel is relative path for assets on website"""
 
-    print("Formatting for a website")
+    print("Formatting for a PDF")
 
     f = open(filepath, 'r')
     text = f.read()
     f.close()
 
     #create patterns
-    # (?!\!.*$) indicates not starting with !, to exclude attachments
 
     #match links of form [[x#y|z]]
     p_xyz = re.compile(r'((?<!\!)(?<!replacementcomplete)\[\[(.*)\#(.*)\|(.*)\]\])')
@@ -115,9 +114,6 @@ def pdf_format(filepath, internal_prefix):
     #[[#x]] -> [x](#x)
     result = re.sub(p_hx, r"replacementcomplete[\2](#\2)", text)
 
-    # #![[a.png]] -> ![](/path/to/attachments/a.png)
-    # result = re.sub(p_a, r"replacementcomplete![]({}/\1)".format(attachments_rel), result)
-
     #[[x#y|z]] -> [z](prefix/x#y)
     result = re.sub(p_xyz, r"replacementcomplete[\4]({}/\2.pdf#\3)".format(internal_prefix), result)
 
@@ -134,11 +130,9 @@ def pdf_format(filepath, internal_prefix):
 
     # #finally, turn reformatted links into lowercase and hyphenated
     replacement = lambda pat: "[" + pat.group(2) + "](" + pat.group(3).lower().replace(" ", "-") + ")"
-    # print(replacement)
-    print(p_final_xy.findall(result))
     result = re.sub(p_final_xy, replacement, result)
 
-    result = writeup_converter.create_contents(result, True) + "\n\n" + result
+    result = writeup_converter.create_contents(result) + "\n\n" + result
 
     # overwrite the file
     f_out = open(filepath, 'w')
@@ -154,7 +148,6 @@ def main():
 
     if not args.no_attachments:
         attachments = find_attachments(filename, args.source_attachments)
-        print(attachments)
         writeup_converter.copy_attachments(attachments, args.target_attachments, args.verbose)
 
     #format as a PDF, or leave in markdown format and create a contents
@@ -164,10 +157,10 @@ def main():
         result = open(filename).read()
         result = writeup_converter.create_contents(result, True) + "\n\n" + result
 
-    # overwrite the file
-    f_out = open(filename, 'w')
-    f_out.write(result)
-    f_out.close()
+        # overwrite the file
+        f_out = open(filename, 'w')
+        f_out.write(result)
+        f_out.close()
 
 if __name__ == '__main__':
     main()
