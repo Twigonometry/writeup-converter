@@ -205,12 +205,16 @@ def website_format(files, target_path, attachments_rel, filename, verbose):
     #match links of form [[x#y|z]]
     p_xyz = re.compile(r'\[\[(.*)\#(.*)\|(.*)\]\]')
 
+    #match links of form [[x|z]]
     p_xz = re.compile(r'\[\[(.*)\|(.*)\]\]')
 
+    #match links of form [[x#y]]
     p_xy = re.compile(r'\[\[(.*)\#(.*)\]\]')
 
+    #match links of form [[x]]
     p_x = re.compile(r'\[\[(.*)\]\]')
 
+    #match links of form [x](y)
     p_final_xy = re.compile(r'\[(.*)\]\(\#(.*)\)')
 
     #replace stuff
