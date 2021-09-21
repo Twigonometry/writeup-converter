@@ -107,8 +107,8 @@ def copy_attachments(attachments, target, verbose):
     print("\n=== Copying attachments ===\n")
 
     for attachment in attachments:
-        if verbose:
-            print("Copy " + str(attachment) + " to " + str(target))
+        # if verbose:
+        print("Copy " + str(attachment) + " to " + str(target))
         copy(attachment, target)
     
     print("Attachments successfully copied")

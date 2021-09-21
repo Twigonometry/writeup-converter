@@ -60,7 +60,7 @@ def find_attachments(file_name, source_attachments):
         sys.exit(1)
 
     #create list of attachments with source folder prepended
-    attachments = map(lambda fname: source_attachments + fname, re.findall(r'\!\[\[(.*)\]\]', open(file_name, 'r').read()))
+    attachments = list(map(lambda fname: source_attachments + fname, re.findall(r'\!\[\[(.*)\]\]', open(file_name, 'r').read())))
 
     for a in attachments:
         print(a)
@@ -102,7 +102,7 @@ def pdf_format(filepath, internal_prefix):
     p_hx = re.compile(r'((?<!\!)(?<!replacementcomplete)\[\[\#(.*)\]\])')
 
     #match links of form [x](y)
-    p_final_xy = re.compile(r'((?<!\!)(?<!replacementcomplete)\[(.*)\]\(\#(.*)\))')
+    p_final_xy = re.compile(r'((?<!\!)(?<!replacementcomplete)\[(.*)\]\((.*)\))')
 
     #set prefix
 
@@ -115,39 +115,31 @@ def pdf_format(filepath, internal_prefix):
     #[[#x]] -> [x](#x)
     result = re.sub(p_hx, r"replacementcomplete[\2](#\2)", text)
 
-    print(result)
-    input()
-
     # #![[a.png]] -> ![](/path/to/attachments/a.png)
     # result = re.sub(p_a, r"replacementcomplete![]({}/\1)".format(attachments_rel), result)
 
     #[[x#y|z]] -> [z](prefix/x#y)
     result = re.sub(p_xyz, r"replacementcomplete[\4]({}/\2#\3)".format(internal_prefix), result)
 
-    print(result)
-    input()
-
     #[[x|z]] -> [z](prefix/x)
     result = re.sub(p_xz, r"replacementcomplete[\3]({}/\2)".format(internal_prefix), result)
-
-    print(result)
-    input()
 
     #[[x#y]] -> [y](prefix/x#y)
     result = re.sub(p_xy, r"replacementcomplete[\3]({}/\2#\3)".format(internal_prefix), result)
 
-    print(result)
-    input()
-
     #[[x]] -> [x](prefix/x)
     result = re.sub(p_x, r"replacementcomplete[\2]({}/#\2)".format(internal_prefix), result)
 
-    print(result)
-    input()
+    result = result.replace("replacementcomplete","")
+
+    # print(result)
+    # input()
 
     # #finally, turn reformatted links into lowercase and hyphenated
-    # replacement = lambda pat: "[" + pat.group(1) + "](#" + pat.group(2).lower().replace(" ", "-") + ")"
-    # result = re.sub(p_final_xy, replacement, result)
+    replacement = lambda pat: "[" + pat.group(2) + "](" + pat.group(3).lower().replace(" ", "-") + ")"
+    # print(replacement)
+    print(p_final_xy.findall(result))
+    result = re.sub(p_final_xy, replacement, result)
 
     result = writeup_converter.create_contents(result) + "\n\n" + result
 
@@ -165,6 +157,7 @@ def main():
 
     if not args.no_attachments:
         attachments = find_attachments(filename, args.source_attachments)
+        print(attachments)
         writeup_converter.copy_attachments(attachments, args.target_attachments, args.verbose)
 
     if args.website:
