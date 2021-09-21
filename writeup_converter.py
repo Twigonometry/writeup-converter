@@ -158,7 +158,10 @@ def create_contents(text, obsidian=False):
     """create a contents table from parsed headers
     obsidian flag indicates single file mode is being used (see file_converter) and markdown format over PDF"""
 
-    contents = "# Contents"
+    if obsidian:
+        contents = "## Contents"
+    else:
+        contents = "# Contents"
 
     headers = re.findall(r'(\#+ .*)', text)
 
