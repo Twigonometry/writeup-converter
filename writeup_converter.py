@@ -154,8 +154,9 @@ def combine_files(files, target_path, filename, verbose):
 
     return combined_path
 
-def create_contents(text, obsidian):
-    """create a contents table from parsed headers"""
+def create_contents(text, obsidian=False):
+    """create a contents table from parsed headers
+    obsidian flag indicates single file mode is being used (see file_converter) and markdown format over PDF"""
 
     contents = "# Contents"
 

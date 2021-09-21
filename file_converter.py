@@ -19,7 +19,7 @@ def parse_args():
     #optional flags
     parser.add_argument("-r", "--remove_prefix", help="Prefix to remove from all your attachment file paths.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose mode. Gives details of which files are being copied. Disabled by default in case of large directories")
-    parser.add_argument("-w", "--website", action="store_true", help="Use website formatting when files are copied.")
+    parser.add_argument("-p", "--pdf", action="store_true", help="Use PDF formatting when files are copied.")
     # parser.add_argument("-l", "--asset_rel_path", help="Relative path for site assets e.g. /assets/images/blogs/..., include this or full system path will be added to links")
     parser.add_argument("-u", "--url_prefix", help="Prefix to add to URLs when converting internal links to website format")
     parser.add_argument("-n", "--no_attachments", action="store_true", help="Don't copy attachments, just the file.")
@@ -157,10 +157,10 @@ def main():
         print(attachments)
         writeup_converter.copy_attachments(attachments, args.target_attachments, args.verbose)
 
-    if args.website:
+    #format as a PDF, or leave in markdown format and create a contents
+    if args.pdf:
         pdf_format(filename, args.url_prefix)
     else:
-        print("Making contents")
         result = open(filename).read()
         result = writeup_converter.create_contents(result, True) + "\n\n" + result
 
