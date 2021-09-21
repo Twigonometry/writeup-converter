@@ -119,21 +119,18 @@ def pdf_format(filepath, internal_prefix):
     # result = re.sub(p_a, r"replacementcomplete![]({}/\1)".format(attachments_rel), result)
 
     #[[x#y|z]] -> [z](prefix/x#y)
-    result = re.sub(p_xyz, r"replacementcomplete[\4]({}/\2#\3)".format(internal_prefix), result)
+    result = re.sub(p_xyz, r"replacementcomplete[\4]({}/\2.pdf#\3)".format(internal_prefix), result)
 
     #[[x|z]] -> [z](prefix/x)
-    result = re.sub(p_xz, r"replacementcomplete[\3]({}/\2)".format(internal_prefix), result)
+    result = re.sub(p_xz, r"replacementcomplete[\3]({}/\2.pdf)".format(internal_prefix), result)
 
     #[[x#y]] -> [y](prefix/x#y)
-    result = re.sub(p_xy, r"replacementcomplete[\3]({}/\2#\3)".format(internal_prefix), result)
+    result = re.sub(p_xy, r"replacementcomplete[\3]({}/\2.pdf#\3)".format(internal_prefix), result)
 
     #[[x]] -> [x](prefix/x)
-    result = re.sub(p_x, r"replacementcomplete[\2]({}/#\2)".format(internal_prefix), result)
+    result = re.sub(p_x, r"replacementcomplete[\2]({}/\2.pdf)".format(internal_prefix), result)
 
     result = result.replace("replacementcomplete","")
-
-    # print(result)
-    # input()
 
     # #finally, turn reformatted links into lowercase and hyphenated
     replacement = lambda pat: "[" + pat.group(2) + "](" + pat.group(3).lower().replace(" ", "-") + ")"
