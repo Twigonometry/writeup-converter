@@ -84,27 +84,25 @@ def pdf_format(filepath, internal_prefix):
     f.close()
 
     #create patterns
-
-    # #match attachments of form ![[a.png]]
-    # p_a = re.compile(r'\!\[\[(.*)\]\]')
+    # (?!\!.*$) indicates not starting with !, to exclude attachments
 
     #match links of form [[x#y|z]]
-    p_xyz = re.compile(r'\[\[(.*)\#(.*)\|(.*)\]\]')
+    p_xyz = re.compile(r'(([^!]|^)\[\[(.*)\#(.*)\|(.*)\]\])')
 
     #match links of form [[x|z]]
-    p_xz = re.compile(r'\[\[(.*)\|(.*)\]\]')
+    p_xz = re.compile(r'(([^!]|^)\[\[(.*)\|(.*)\]\])')
 
     #match links of form [[x#y]]
-    p_xy = re.compile(r'\[\[(.*)\#(.*)\]\]')
+    p_xy = re.compile(r'(([^!]|^)\[\[(.*)\#(.*)\]\])')
 
     #match links of form [[x]]
-    p_x = re.compile(r'\[\[(.*)\]\]')
+    p_x = re.compile(r'(([^!]|^)\[\[(.*)\]\])')
 
     #match links of form [[#x]]
-    p_hx = re.compile(r'\[\[\#(.*)\]\]')
+    p_hx = re.compile(r'(([^!]|^)\[\[\#(.*)\]\])')
 
     #match links of form [x](y)
-    p_final_xy = re.compile(r'\[(.*)\]\(\#(.*)\)')
+    p_final_xy = re.compile(r'(([^!]|^)\[(.*)\]\(\#(.*)\))')
 
     #set prefix
 
@@ -112,6 +110,7 @@ def pdf_format(filepath, internal_prefix):
         internal_prefix = ""
 
     #replace stuff
+    #string replacementcomplete marks the link to not be caught by regex a second time
 
     #[[#x]] -> [x](#x)
     result = re.sub(p_hx, r"[\1](#\1)", text)
@@ -153,8 +152,8 @@ def main():
         attachments = find_attachments(filename, args.source_attachments)
         writeup_converter.copy_attachments(attachments, args.target_attachments, args.verbose)
 
-    # if args.website:
-    #     pdf_format(filename, args.url_prefix)
+    if args.website:
+        pdf_format(filename, args.url_prefix)
 
 if __name__ == '__main__':
     main()
