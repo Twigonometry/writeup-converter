@@ -87,22 +87,22 @@ def pdf_format(filepath, internal_prefix):
     # (?!\!.*$) indicates not starting with !, to exclude attachments
 
     #match links of form [[x#y|z]]
-    p_xyz = re.compile(r'(([^!]|^)\[\[(.*)\#(.*)\|(.*)\]\])')
+    p_xyz = re.compile(r'((?<!\!)(?<!replacementcomplete)\[\[(.*)\#(.*)\|(.*)\]\])')
 
     #match links of form [[x|z]]
-    p_xz = re.compile(r'(([^!]|^)\[\[(.*)\|(.*)\]\])')
+    p_xz = re.compile(r'((?<!\!)(?<!replacementcomplete)\[\[(.*)\|(.*)\]\])')
 
     #match links of form [[x#y]]
-    p_xy = re.compile(r'(([^!]|^)\[\[(.*)\#(.*)\]\])')
+    p_xy = re.compile(r'((?<!\!)(?<!replacementcomplete)\[\[(.*)\#(.*)\]\])')
 
     #match links of form [[x]]
-    p_x = re.compile(r'(([^!]|^)\[\[(.*)\]\])')
+    p_x = re.compile(r'((?<!\!)(?<!replacementcomplete)\[\[(.*)\]\])')
 
     #match links of form [[#x]]
-    p_hx = re.compile(r'(([^!]|^)\[\[\#(.*)\]\])')
+    p_hx = re.compile(r'((?<!\!)(?<!replacementcomplete)\[\[\#(.*)\]\])')
 
     #match links of form [x](y)
-    p_final_xy = re.compile(r'(([^!]|^)\[(.*)\]\(\#(.*)\))')
+    p_final_xy = re.compile(r'((?<!\!)(?<!replacementcomplete)\[(.*)\]\(\#(.*)\))')
 
     #set prefix
 
@@ -113,22 +113,37 @@ def pdf_format(filepath, internal_prefix):
     #string replacementcomplete marks the link to not be caught by regex a second time
 
     #[[#x]] -> [x](#x)
-    result = re.sub(p_hx, r"[\1](#\1)", text)
+    result = re.sub(p_hx, r"replacementcomplete[\2](#\2)", text)
+
+    print(result)
+    input()
 
     # #![[a.png]] -> ![](/path/to/attachments/a.png)
-    # result = re.sub(p_a, r"![]({}/\1)".format(attachments_rel), result)
+    # result = re.sub(p_a, r"replacementcomplete![]({}/\1)".format(attachments_rel), result)
 
     #[[x#y|z]] -> [z](prefix/x#y)
-    result = re.sub(p_xyz, r"[\3]({}/\1#\2)".format(internal_prefix), result)
+    result = re.sub(p_xyz, r"replacementcomplete[\4]({}/\2#\3)".format(internal_prefix), result)
+
+    print(result)
+    input()
 
     #[[x|z]] -> [z](prefix/x)
-    result = re.sub(p_xz, r"[\2]({}/\1)".format(internal_prefix), result)
+    result = re.sub(p_xz, r"replacementcomplete[\3]({}/\2)".format(internal_prefix), result)
+
+    print(result)
+    input()
 
     #[[x#y]] -> [y](prefix/x#y)
-    result = re.sub(p_xy, r"[\2]({}/\1#\2)".format(internal_prefix), result)
+    result = re.sub(p_xy, r"replacementcomplete[\3]({}/\2#\3)".format(internal_prefix), result)
+
+    print(result)
+    input()
 
     #[[x]] -> [x](prefix/x)
-    result = re.sub(p_x, r"[\1]({}/#\1)".format(internal_prefix), result)
+    result = re.sub(p_x, r"replacementcomplete[\2]({}/#\2)".format(internal_prefix), result)
+
+    print(result)
+    input()
 
     # #finally, turn reformatted links into lowercase and hyphenated
     # replacement = lambda pat: "[" + pat.group(1) + "](#" + pat.group(2).lower().replace(" ", "-") + ")"
